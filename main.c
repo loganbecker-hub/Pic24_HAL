@@ -1,13 +1,21 @@
 #include "config.h"
 #include "GPIO_HAL.h"
+#include "ADC_HAL.h"
 
-int main(void){
-  HAL_GPIO_Init(GPIOB, GPIO_PIN_1, GPIO_OUTPUT); // Set PB1 as output
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_SET); // Set pin PB1
-  HAL_GPIO_Init(GPIOC, GPIO_PIN_3, GPIO_OUTPUT);
+int main(void){  
+  uint16_t adc = 0;
+  HAL_GPIO_Init(GPIOB, GPIO_PIN_2, GPIO_OUTPUT);
+  HAL_ADC_Init(channel_1);
+
   while(1){
-    __delay_ms(500);
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_3);
+    HAL_ADC_Start(); // Start the conversion 
+    if(HAL_ADC_PollForConversion(100) == 1){
+      adc = HAL_ADC_GetValue(); // Get the adc value
+    }
+    else{
+      HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+      __delay_ms(100);
+    }
   }
   return 0;
 }
